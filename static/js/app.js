@@ -27,15 +27,13 @@ function init() {
         for (i = 0; i<dataID.length; i++){
             dropDownMenu.append("option").text(dataID[i]).property("value", dataID[i])   
         }
+
         // Assign the value of the dropdown menu option to a variable
         let dataset = dropDownMenu.property("value");
         displayBarGraph(dataset);
         displayBubbbleChart(dataset);
 
-        // d3.selectAll("#selDataset").on("change", updateBar);
-
     });
-
 }
 
 function optionChanged(id) {
@@ -99,21 +97,26 @@ function displayBubbbleChart(sampleID) {
             mode: 'markers',
             marker: {
                 color: dataOTU_id,
-                size: dataSampleValues
+                colorscale: 'Rainbow',
+                size: dataSampleValues,
+                sizemode: 'area',
+                sizeref: .05
             },
-            type: 'scatter'
+            type: 'scatter',
         };
 
         let traceData = [trace1];
 
         let layout = {
-            title: ("Top 10 OTUs of Sample ID: " + String(dataID)),
+            title: ("Sample ID: " + String(dataID)),
           };
 
     Plotly.newPlot("bubble", traceData, layout);
 }); 
 }
 
-// displayBarGraph("940")
-// displayBubbbleChart("940");
+function displayMetaData(sampleID) {
+    d3.select("#sample-metadata")
+}
+
 init();
