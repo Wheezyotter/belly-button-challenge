@@ -21,8 +21,6 @@ function init() {
         dataSampleValues = samples.map(sample_values => sample_values.sample_values);
         dataOTULabel = samples.map(otu_labels => otu_labels.otu_labels);
 
-        // d3.selectAll("#selDataset").on("change", updateBar);
-
         // Use D3 to select the dropdown menu
         let dropDownMenu = d3.select("#selDataset");
 
@@ -31,13 +29,18 @@ function init() {
         }
         // Assign the value of the dropdown menu option to a variable
         let dataset = dropDownMenu.property("value");
+        displayBarGraph(dataset);
+        displayBubbbleChart(dataset);
+
+        // d3.selectAll("#selDataset").on("change", updateBar);
 
     });
 
 }
 
 function optionChanged(id) {
-
+    displayBarGraph(id);
+    displayBubbbleChart(id);
 }
 
 function displayBarGraph(sampleID) {
@@ -46,43 +49,71 @@ function displayBarGraph(sampleID) {
             metadata = data.metadata;
             samples = data.samples;
 
-            let filteredID = samples.filter((elem) => elem.id === sampleID);
-            let sortedData = filteredID.sort((a, b) => b.sample_values - a.sample_values);
-            let slicedData = Object.values(sortedData[0]);
-            slicedData_test = slicedData.slice(0,10);
+            let findData = samples.find((elem) => elem.id === sampleID);
 
-            dataID = slicedData_test.map(id => id.id);
-            dataOTU_id = slicedData_test.map(otu_ids => otu_ids.otu_ids);
-            dataSampleValues = slicedData_test.map(sample_values => sample_values.sample_values);
-            dataOTULabel = slicedData_test.map(otu_labels => otu_labels.otu_labels);
-
-            console.log(typeof slicedData_test)
-            console.log("test1", slicedData_test);
+            dataID = findData.id
+            dataOTU_id = (findData.otu_ids).slice(0,10).map(i => 'OTU ' + i).reverse();
+            dataSampleValues = (findData.sample_values).slice(0,10).reverse();
+            dataOTULabel = (findData.otu_labels).slice(0,10).reverse();
+            // console.log(dataOTULabel); //Format hover text
 
             let trace1 = {
-                x: (dataOTU_id),
-                y: (dataSampleValues),
-                text: (dataOTULabel),
+                x: dataSampleValues,
+                y: dataOTU_id,
+                text: dataOTULabel, 
                 name: "OTU",
                 type: "bar",
-                // orientation: "h"
+                orientation: "h"
+                // ,hovertemplate:  '<i>Price</i>: $%{y:.2f}' +
+                //                 '<br><b>X</b>: %{x}<br>' +
+                //                 '<b>%{text}</b>'
             }
 
             let traceData = [trace1];
 
             let layout = {
-                title: "Greek gods search results",
-                margin: {
-                  l: 100,
-                  r: 100,
-                  t: 100,
-                  b: 100
-                }
+                title: ("Top 10 OTUs of Sample ID: " + String(dataID)),
               };
 
         Plotly.newPlot("bar", traceData, layout);
-            
     });
 }
-displayBarGraph("940")
-init()
+
+function displayBubbbleChart(sampleID) {
+    d3.json(sample_url).then(function(data) {
+        names = data.names;
+        metadata = data.metadata;
+        samples = data.samples;
+
+        let findData = samples.find((elem) => elem.id === sampleID);
+
+        dataID = findData.id;
+        dataOTU_id = findData.otu_ids;
+        dataSampleValues = findData.sample_values;
+        dataOTULabel = findData.otu_labels;
+
+        let trace1 = {
+            x: dataOTU_id,
+            y: dataSampleValues,
+            text: dataOTULabel, 
+            mode: 'markers',
+            marker: {
+                color: dataOTU_id,
+                size: dataSampleValues
+            },
+            type: 'scatter'
+        };
+
+        let traceData = [trace1];
+
+        let layout = {
+            title: ("Top 10 OTUs of Sample ID: " + String(dataID)),
+          };
+
+    Plotly.newPlot("bubble", traceData, layout);
+}); 
+}
+
+// displayBarGraph("940")
+// displayBubbbleChart("940");
+init();
