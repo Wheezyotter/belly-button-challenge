@@ -11,6 +11,14 @@ function init() {
     let dataSampleValues = [];
     let dataOTULabel = [];
 
+    tagID = d3.select("#sample-metadata").append("h5");      
+    tagEth = d3.select("#sample-metadata").append("h5");      
+    tagGen = d3.select("#sample-metadata").append("h5");      
+    tagAge = d3.select("#sample-metadata").append("h5");      
+    tagLoc = d3.select("#sample-metadata").append("h5");      
+    tagBB = d3.select("#sample-metadata").append("h5");      
+    tagWF = d3.select("#sample-metadata").append("h5");
+
     d3.json(sample_url).then(function(data) {
         names = data.names;
         metadata = data.metadata;
@@ -30,8 +38,11 @@ function init() {
 
         // Assign the value of the dropdown menu option to a variable
         let dataset = dropDownMenu.property("value");
+
         displayBarGraph(dataset);
+        displayGauge(dataset);
         displayBubbbleChart(dataset);
+        displayMetaData(dataset);
 
     });
 }
@@ -39,6 +50,7 @@ function init() {
 function optionChanged(id) {
     displayBarGraph(id);
     displayBubbbleChart(id);
+    displayMetaData(id);
 }
 
 function displayBarGraph(sampleID) {
@@ -116,7 +128,76 @@ function displayBubbbleChart(sampleID) {
 }
 
 function displayMetaData(sampleID) {
-    d3.select("#sample-metadata")
+    d3.json(sample_url).then(function(data) {
+        names = data.names;
+        metadata = data.metadata;
+        samples = data.samples;
+
+        let findMetaData = metadata.find((elem) => elem.id === Number(sampleID));
+
+        dataID = findMetaData.id;
+        dataEthnicity = findMetaData.ethnicity;
+        dataGender = findMetaData.gender;
+        dataAge = findMetaData.age;
+        dataLocation = findMetaData.location;
+        dataBBType = findMetaData.bbtype;
+        dataWFreq = findMetaData.wfreq;
+
+        tagID.text(`id: ${dataID}`);    
+        tagEth.text(`Ethnicity: ${dataEthnicity}`);    
+        tagGen.text(`Gender: ${dataGender}`);         
+        tagAge.text(`Age: ${dataAge}`);        
+        tagLoc.text(`Location: ${dataLocation}`);          
+        tagBB.text(`bbtype: ${dataBBType}`);     
+        tagWF.text(`wfreq: ${dataWFreq}`);        
+    });
+}
+
+function displayGauge(sampleID) {
+    let dataWFreq = []
+    d3.json(sample_url).then(function(data) {
+        names = data.names;
+        metadata = data.metadata;
+        samples = data.samples;
+
+        let findMetaData = metadata.find((elem) => elem.id === Number(sampleID));
+
+        dataID = findMetaData.id;
+        dataWFreq = findMetaData.wfreq;
+    });
+
+    var data = [
+        {
+          domain: { x: [0, 1], y: [0, 1] },
+          value: dataWFreq,
+          title: { 
+            text: "Belly Button Wash Frequency" 
+          },
+          type: "indicator",
+          mode: "gauge",
+          gauge: {
+            axis: { range: [null, 10] },
+            steps: [
+              { range: [0, 1], color: "lightgray" },
+              { range: [1, 2], color: "gray" },
+              { range: [2, 3], color: "gray" },
+              { range: [3, 4], color: "gray" },
+              { range: [4, 5], color: "gray" },
+              { range: [5, 6], color: "gray" },
+              { range: [7, 8], color: "gray" },
+              { range: [8, 9], color: "gray" }
+            ],
+            threshold: {
+              line: { color: "red", width: 4 },
+              thickness: 0.75,
+              value: dataWFreq
+            }
+          }
+        }
+      ];
+      
+      var layout = { width: 600, height: 450, margin: { t: 0, b: 0 } };
+      Plotly.newPlot('gauge', data, layout);
 }
 
 init();
