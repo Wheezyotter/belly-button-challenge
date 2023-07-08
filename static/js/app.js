@@ -155,6 +155,7 @@ function displayMetaData(sampleID) {
 
 function displayGauge(sampleID) {
     let dataWFreq = []
+    var gaugeData = []
     d3.json(sample_url).then(function(data) {
         names = data.names;
         metadata = data.metadata;
@@ -164,40 +165,41 @@ function displayGauge(sampleID) {
 
         dataID = findMetaData.id;
         dataWFreq = findMetaData.wfreq;
-    });
+        console.log(dataWFreq)
 
-    var data = [
-        {
-          domain: { x: [0, 1], y: [0, 1] },
-          value: dataWFreq,
-          title: { 
-            text: "Belly Button Wash Frequency" 
-          },
-          type: "indicator",
-          mode: "gauge",
-          gauge: {
-            axis: { range: [null, 10] },
-            steps: [
-              { range: [0, 1], color: "lightgray" },
-              { range: [1, 2], color: "gray" },
-              { range: [2, 3], color: "gray" },
-              { range: [3, 4], color: "gray" },
-              { range: [4, 5], color: "gray" },
-              { range: [5, 6], color: "gray" },
-              { range: [7, 8], color: "gray" },
-              { range: [8, 9], color: "gray" }
-            ],
-            threshold: {
-              line: { color: "red", width: 4 },
-              thickness: 0.75,
-              value: dataWFreq
+        gaugeData = [
+            {
+            domain: { x: [0, 1], y: [0, 1] },
+            value: dataWFreq,
+            title: { 
+                text: "Belly Button Wash Frequency" 
+            },
+            type: "indicator",
+            mode: "gauge+number",
+            gauge: {
+                axis: { range: [null, 9] },
+                steps: [
+                { range: [0, 1], color: "white" },
+                { range: [1, 2], color: "white" },
+                { range: [2, 3], color: "white" },
+                { range: [3, 4], color: "white" },
+                { range: [4, 5], color: "white" },
+                { range: [5, 6], color: "white" },
+                { range: [7, 8], color: "white" },
+                { range: [8, 9], color: "white" }
+                ],
+                threshold: {
+                line: { color: "red", width: 4 },
+                thickness: 0.75,
+                value: dataWFreq
+                },
             }
-          }
-        }
-      ];
+            }
+        ];
+    });
       
       var layout = { width: 600, height: 450, margin: { t: 0, b: 0 } };
-      Plotly.newPlot('gauge', data, layout);
+      Plotly.newPlot('gauge', gaugeData, layout);
 }
 
 init();
